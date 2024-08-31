@@ -20,6 +20,7 @@ class Ship {
   isSunk() {
     return this.hits >= this.length;
   }
+  //ДРБАВИТЬ ШАБЛОН КАРАБЛЕЙ ПО НАЗВАНИЯМ
 }
 
 class Gameboard {
@@ -28,6 +29,9 @@ class Gameboard {
     this.width = width;
     this.gameOver = gameOver;
   }
+  // ДОБАВИТЬ ПРОВЕРКУ ЧТОБЫ ВСЕ КОРАБЛИ БЫЛИ ПОСТАВЛЕНЫ НА ПОЛЕ
+
+  //ДОБАВТЬ ПРОВЕРКУ КОНЦА ИГРЫ
 
   createBoard() {
     const gameBoardObj = new Object();
@@ -56,16 +60,19 @@ class Gameboard {
   }
 
   shot(y, x) {
+    let miss;
+    let get;
     if (x >= this.width || x < 0 || y >= this.height || y < 0) {
       return new Error("значения координат должны быть в пределах поля");
     }
-    console.log("fdfd");
     if (this.gameBoardObj[y][x] == 7 || this.gameBoardObj[y][x] == 2) {
-      return this.gameBoardObj;
+      return new Error("это поле уже было атаковано");
     } else if (this.gameBoardObj[y][x] == 0) {
       this.gameBoardObj[y].splice(x, 1, 2);
+      return (miss = [y, x]);
     } else if (this.gameBoardObj[y][x] == 1) {
       this.gameBoardObj[y].splice(x, 1, 7);
+      return (get = [y, x]);
     }
   }
 }
