@@ -59,6 +59,11 @@ describe("test from board", () => {
     board.shot(1, 1);
     expect(board.gameBoardObj[1][1]).toBe(2);
   });
+  it("method shot(2, 1) => return get = [2, 1]", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    expect(board.shot(2, 1)).toEqual([2, 1]);
+  });
   it("method shot(1, 1) => when hitting the ship, it should change the value to 7", () => {
     const board = new Gameboard(10);
     board.createBoard();
@@ -68,6 +73,7 @@ describe("test from board", () => {
     expect(board.gameBoardObj[1][1]).toBe(7);
     expect(board.gameBoardObj[1][2]).toBe(7);
   });
+
   it("the size of the field is 10 => 0-9, the value of 10 for key goes beyond these limits, method shot(10, 1) => Error", () => {
     const board = new Gameboard(10);
     board.createBoard();
