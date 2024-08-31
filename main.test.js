@@ -32,7 +32,7 @@ describe("test from board", () => {
     expect(board.height).toBe(10);
     expect(board.width).toBe(10);
   });
-  it("createBoard() created obj lengh == Gameboard height", () => {
+  it("createBoard() created obj height == Gameboard height", () => {
     const board = new Gameboard(10);
     board.createBoard();
     expect(Object.keys(board.gameBoardObj).length).toBe(10);
@@ -58,5 +58,24 @@ describe("test from board", () => {
     board.createBoard();
     board.shot(1, 1);
     expect(board.gameBoardObj[1][1]).toBe(2);
+  });
+  it("method shot(1, 1) => when hitting the ship, it should change the value to 7", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    board.shot(1, 1);
+    board.shot(1, 2);
+    expect(board.gameBoardObj[1][1]).toBe(7);
+    expect(board.gameBoardObj[1][2]).toBe(7);
+  });
+  it("the size of the field is 10 => 0-9, the value of 10 for key goes beyond these limits, method shot(10, 1) => Error", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    expect(board.shot(10, 1)).toEqual(Error("значения координат должны быть в пределах поля"));
+  });
+  it("the size of the field is -1 => 0-9, the value of 10 for key goes beyond these limits, method shot(-1, 1) => Error", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    expect(board.shot(-1, 1)).toEqual(Error("значения координат должны быть в пределах поля"));
   });
 });
