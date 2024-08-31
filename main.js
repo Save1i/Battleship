@@ -55,8 +55,8 @@ class Gameboard {
     }
   }
 
-  shot(x, y) {
-    if (x > this.width || x < 0 || y > this.height || y < 0) {
+  shot(y, x) {
+    if (x >= this.width || x < 0 || y >= this.height || y < 0) {
       return new Error("значения координат должны быть в пределах поля");
     }
     console.log("fdfd");
