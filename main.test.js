@@ -84,4 +84,47 @@ describe("test from board", () => {
     board.createBoard();
     expect(board.shot(-1, 1)).toEqual(Error("значения координат должны быть в пределах поля"));
   });
+  it("When there are no ships left on the map, the game is over", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    board.shot(1, 1);
+    board.shot(1, 2);
+    expect(board.gameOver).toBe(true);
+  });
+  it("When there are no ships left on the map, the game is over", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    board.shot(1, 1);
+    board.shot(1, 2);
+    expect(board.startGame).toBe(true);
+  });
+  it("After the first shot, the game start Game == true, permutation is prohibited", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    board.shot(1, 1);
+    expect(board.placeShip(4, 1, 4)).toEqual(
+      Error("игра уже началась, нельзя переставлять корабли")
+    );
+  });
+  it("checking the placement of ships, placeShip(1, 1, 2) and board.placeShip(1, 2, 4) => Error", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    expect(board.placeShip(1, 2, 4)).toEqual(Error("сюда нельзя поставить корабль"));
+  });
+  it("checking the placement of ships, placeShip(1, 1, 2) and board.placeShip(1, 2, 4) => Error", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(1, 1, 2);
+    expect(board.placeShip(1, 3, 4)).toEqual(Error("сюда нельзя поставить корабль"));
+  });
+  it("checking the placement of ships, placeShip(1, 1, 2) and board.placeShip(1, 2, 4) => Error", () => {
+    const board = new Gameboard(10);
+    board.createBoard();
+    board.placeShip(2, 0, 2);
+    expect(board.placeShip(3, 0, 2)).toEqual(Error("сюда нельзя поставить корабль"));
+  });
 });
