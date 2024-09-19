@@ -455,10 +455,9 @@ setInterval(() => {
   ) {
     botShot(p1);
   }
-}, 2000);
+}, 1000);
 
 bot();
-// shotOnBoard(p1);
 
 function startGame() {
   p1.gameBoard.startGame = true;
@@ -514,10 +513,8 @@ function displayInfo(text) {
   });
 }
 
-function shipBoom(params) {}
-
 function identifyShip(activePlayer, y, x) {
-  let originalPlayer = activePlayer; // Сохраняем игрока, который сделал выстрел
+  let originalPlayer = activePlayer;
   activePlayer = activePlayer == p1 ? p2 : p1;
   let arrShip = activePlayer.gameBoard.coordinatesShip;
 
@@ -600,4 +597,4 @@ function identifyShip(activePlayer, y, x) {
   }
 }
 
-// module.exports = { Ship, Gameboard, Player };
+module.exports = { Ship, Gameboard, Player };
