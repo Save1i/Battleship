@@ -20,11 +20,10 @@ class Ship {
   isSunk() {
     return this.hits >= this.length;
   }
-  //ДРБАВИТЬ ШАБЛОН КАРАБЛЕЙ ПО НАЗВАНИЯМ -- нет
 }
 
 class Gameboard {
-  constructor(height = 10, width = 10, startGame = false, gameOver = false, active = true) {
+  constructor(height = 10, width = 10, startGame = false, gameOver = false, active = false) {
     this.height = height;
     this.width = width;
     this.gameOver = gameOver;
@@ -37,11 +36,7 @@ class Gameboard {
 
     this.createBoard();
   }
-  // ДОБАВИТЬ ПРОВЕРКУ ЧТОБЫ ВСЕ КОРАБЛИ БЫЛИ ПОСТАВЛЕНЫ НА ПОЛЕ -- нет
 
-  //ДОБАВТЬ ПРОВЕРКУ КОНЦА ИГРЫ -- есть
-
-  //Добавить проверку на начало игры!!! -- есть
   createBoard() {
     const gameBoardObj = new Object();
     for (let i = 0; i < this.height; i++) {
@@ -87,22 +82,21 @@ class Gameboard {
       return new Error("часть карабля выходит за пределы поля");
     }
 
-    let x = startP;
-    let y = key;
-    let l = length;
-    this.coordinatesShip.push(y, x, l);
-    // проверка на расстояние от кораблей 1 клетка -- нет
+    this.coordinatesShip.push(key, startP, length);
+
     for (let i = startP; i < startP + length; i++) {
-      this.gameBoardObj[key].splice(i, 1, 1);
+      this.gameBoardObj[key].splice(i, 1, 1); // исправь 1 !!!!!
     }
   }
 
   shot(y, x) {
+    console.log(this.gameBoardObj);
     // this.active = !this.active;
-    this.startGame = true;
+
+    let numOnObj = this.gameBoardObj[y][x];
 
     if (isNaN(x) || isNaN(y)) {
-      throw new Error("Координаты должны быть числами");
+      throw new Error("Координаты не введены");
     }
     if (x >= this.width || x < 0 || y >= this.height || y < 0) {
       throw new Error("Значения координат должны быть в пределах поля");
@@ -110,13 +104,14 @@ class Gameboard {
     if (this.gameOver) {
       throw new Error("Игра окончена! Все корабли уничтожены.");
     }
-    if (this.gameBoardObj[y][x] === 7 || this.gameBoardObj[y][x] === 2) {
-      throw new Error("Это поле уже было атаковано");
-    } else if (this.gameBoardObj[y][x] === 0) {
+    if (numOnObj === 7 || numOnObj === 2) {
+      return new Error("Это поле уже было атаковано");
+    }
+    if (numOnObj === 0) {
       this.gameBoardObj[y].splice(x, 1, 2);
       this.coordinateShot.push([y, x]);
       return [y, x, 2];
-    } else if (this.gameBoardObj[y][x] === 1) {
+    } else if (numOnObj === 1) {
       this.gameBoardObj[y].splice(x, 1, 7);
       this.coordinateShot.push([y, x]);
       this.endGame();
@@ -138,9 +133,6 @@ class Player {
   constructor(isCpu) {
     this.isCpu = isCpu;
     this.name = this.isCpu ? "Computer" : "Player ";
-    // this.key = key;
-    // this.startP = startP;
-    // this.length = length;
     this.gameBoard = new Gameboard();
   }
 }
@@ -150,22 +142,37 @@ const p2 = new Player(true); // computer
 
 const pSections = document.querySelectorAll(".sect");
 const rSections = document.querySelectorAll(".section");
+const sections = document.querySelectorAll(".sections");
 
-function click(activePlayer) {
-  return new Promise((resolve) => {
-    if (activePlayer.isCpu == false) {
-      rSections.forEach((section) => {
-        section.addEventListener("click", (e) => {
-          resolve(e.currentTarget.getAttribute("value"));
-        });
-      });
-    } else if (activePlayer.isCpu == true) {
-      pSections.forEach((section) => {
-        section.addEventListener("click", (e) => {
-          resolve(e.currentTarget.getAttribute("value"));
-        });
-      });
-    }
+function gameOver(player1, player2) {
+  if (player1.gameBoard.gameOver || player2.gameBoard.gameOver) {
+    throw new Error("Game Over");
+  }
+}
+
+function click(activePlayer, value) {
+  let noActive = activePlayer === p1 ? p2 : p1;
+  sections.forEach((section) => {
+    section.addEventListener("click", (e) => {
+      value = e.currentTarget.getAttribute("value");
+      if (
+        e.currentTarget.attributes.id.value === "r" &&
+        activePlayer.gameBoard.active &&
+        activePlayer.gameBoard.startGame &&
+        noActive.gameBoard.startGame
+      ) {
+        gameOver(activePlayer, noActive);
+        shotOnBoard(activePlayer, value);
+      } else if (
+        e.currentTarget.attributes.id.value === "p" &&
+        !activePlayer.gameBoard.active &&
+        activePlayer.gameBoard.startGame &&
+        noActive.gameBoard.startGame
+      ) {
+        gameOver(activePlayer, noActive);
+        shotOnBoard(activePlayer, value);
+      }
+    });
   });
 }
 
@@ -177,38 +184,57 @@ function convertInXY(value) {
   return [y, x];
 }
 
-async function shotOnBoard(activePlayer) {
-  activePlayer = activePlayer == p1 ? p1 : p2;
+async function shotOnBoard(activePlayer, value, y, x) {
   let noActive = activePlayer === p1 ? p2 : p1;
 
-  // Continuously check if the game is over and perform shots
-  while (!noActive.gameBoard.gameOver) {
-    console.log("End Game Status:", noActive.gameBoard.gameOver);
-
-    try {
-      // Await the player's shot input
-      const shot = await click(activePlayer);
-      const [y, x] = convertInXY(shot); // Convert the clicked section to coordinates
-
-      // Execute the shot and display the result
-      let coords = noActive.gameBoard.shot(y, x);
-      console.log("Shot Result:", coords);
-
-      displayShot(activePlayer, coords, shot); // Visualize the shot on the board
-
-      // Update the game-over status after the shot
+  try {
+    if (activePlayer.gameBoard.active) {
       noActive.gameBoard.endGame();
-      // Check if the game has ended after the shot
-      if (noActive.gameBoard.gameOver) {
-        console.log("Game Over!");
-        break;
+      // Если value передан, преобразуем его в координаты, иначе используем переданные y и x
+      if (value !== undefined) {
+        const yx = convertInXY(value);
+        y = yx[0];
+        x = yx[1];
       }
 
-      // Switch turns between players after each shot
-      [activePlayer, noActive] = [noActive, activePlayer]; // Swap players
-    } catch (error) {
-      console.error("Error during shot:", error.message);
+      let coords = noActive.gameBoard.shot(y, x);
+      console.log("Shot Result:", coords);
+      identifyShip(activePlayer, y, x);
+
+      if (coords[2] == 2) {
+        activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
+      }
+
+      displayShot(activePlayer, coords, value);
+    } else if (!noActive.gameBoard.active) {
+      activePlayer.gameBoard.endGame();
+
+      // Если value передан, преобразуем его в координаты, иначе используем переданные y и x
+      if (value !== undefined) {
+        const yx = convertInXY(value);
+        y = yx[0];
+        x = yx[1];
+      }
+
+      coords = activePlayer.gameBoard.shot(y, x);
+      console.log("Shot Result:", coords);
+      identifyShip(noActive, y, x);
+
+      displayShot(noActive, coords, value);
+      if (coords[2] == 2) {
+        activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
+      }
+    } else {
+      console.log("hhhhh");
     }
+    if (noActive.gameBoard.gameOver == true) {
+      throw new Error("Ты победил ИИ!");
+    } else if (activePlayer.gameBoard.gameOver == true) {
+      throw new Error("Ты проиграл ИИ!");
+    }
+  } catch ({ name, message }) {
+    displayInfo(message);
+    console.error(error);
   }
 }
 
@@ -223,7 +249,6 @@ function displayShot(activePlayer, coords, value) {
       const boom = document.createElement("div");
       boom.classList.add("boom");
       targetSection.append(boom);
-      console.log("boom");
     }
   } else if (coords[2] == 7) {
     const targetSection = document.querySelector(`#${id}[value='${value}']`);
@@ -351,79 +376,228 @@ function shipdisplay(activePlayer) {
         break;
     }
   }
-
   console.log(arrShip);
 }
 
 function clearBoard(activePlayer) {
+  let object = activePlayer.gameBoard.gameBoardObj;
+  for (const key in object) {
+    if (object[key].includes(1)) {
+      object[key] = Array(10).fill(0);
+    }
+  }
+
   const allSection = document.querySelectorAll(".sect");
   allSection.forEach((element) => {
     while (element.firstChild) {
       element.removeChild(element.firstChild);
     }
   });
+
+  console.log(activePlayer.gameBoard.gameBoardObj);
+
   activePlayer.gameBoard.coordinatesShip = [];
 }
 
-function randomShip(activePlayer) {
-  // arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
-  arrShip = [1];
+function randomShip(activePlayer, randKey, startP) {
+  const arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
+  // const arrShip = [3, 1];
   clearBoard(activePlayer);
 
   arrShip.forEach((element) => {
     let isPlaced = false;
-    while (!isPlaced) {
+    let attempts = 0; // Счётчик попыток
+    const maxAttempts = 100; // Максимальное количество попыток
+
+    while (!isPlaced && attempts < maxAttempts) {
       let randKey = Math.floor(Math.random() * 10);
-      let startP = Math.floor(Math.random() * 10);
+      let startP = Math.floor(Math.random() * 10); // убрать коммит для рандома !!!!!1
       const result = activePlayer.gameBoard.placeShip(randKey, startP, element);
 
       if (!(result instanceof Error)) {
         isPlaced = true;
+      } else {
+        attempts++; // Увеличиваем количество попыток
       }
+    }
+
+    if (attempts >= maxAttempts) {
+      console.error(
+        `Не удалось разместить корабль длиной ${element} после ${maxAttempts} попыток.`
+      );
+      randomShip(activePlayer);
     }
   });
 }
+
+function botShot(activePlayer) {
+  const randValue = Math.floor(Math.random() * 101); // 0-100
+
+  shotOnBoard(activePlayer, randValue);
+}
+
+//ПЕРЕСМОТРЕТЬ КОД, ПРИ МНОГОКРАТНОМ ВЫЗОВЕ, ЛОЖИТ БРАУЗЕР!!!!!!!!!!!
 
 function bot() {
   randomShip(p2);
   shipdisplay(p2);
 }
 
+setInterval(() => {
+  let activePlayer = p1;
+  let noActive = activePlayer === p1 ? p2 : p1;
+  if (
+    !noActive.gameBoard.gameOver &&
+    !activePlayer.gameBoard.gameOver &&
+    !activePlayer.gameBoard.active &&
+    activePlayer.gameBoard.startGame &&
+    noActive.gameBoard.startGame
+  ) {
+    botShot(p1);
+  }
+}, 2000);
+
 bot();
+// shotOnBoard(p1);
 
-// async function handleTurns() {
-//   let activePlayer = p1.gameBoard.active ? p1 : p2;
-//   let noActivePlayer = p1.gameBoard.active ? p2 : p1;
+function startGame() {
+  p1.gameBoard.startGame = true;
+  p2.gameBoard.startGame = true;
+  p1.gameBoard.active = true;
+}
 
-//   while (!noActivePlayer.gameBoard.gameOver) {
-//     console.log(`It's ${activePlayer.name}'s turn`);
-
-//     // Ensure the shotOnBoard function finishes before switching turns
-//     await shotOnBoard(activePlayer);
-
-//     // Switch the active player
-//     p1.gameBoard.active = !p1.gameBoard.active;
-//     p2.gameBoard.active = !p2.gameBoard.active;
-
-//     activePlayer = p1.gameBoard.active ? p1 : p2;
-//     noActivePlayer = p1.gameBoard.active ? p2 : p1;
-//   }
-
-//   console.log("Game Over!");
-// }
-
-// Функция для начала игры по нажатию на кнопку "Start"
-function startGame() {}
-shotOnBoard(p1);
+click(p1);
 
 const startBtn = document.querySelector(".start__btn");
 const randomise = document.querySelector(".move-ship__btn");
 
-startBtn.addEventListener("click", startGame);
+startBtn.addEventListener("click", () => {
+  const shipisplaced = !Object.values(p1.gameBoard.gameBoardObj).some((row) => row.includes(1));
+  if (!shipisplaced) {
+    startGame();
+    startBtn.disabled = true;
+    startBtn.classList.add("disable");
+  } else {
+    console.log("тестировщик молодец");
+  }
+});
 
 randomise.addEventListener("click", () => {
-  randomShip(p1);
+  randomShip(p1); //убрать числа для рандома
   shipdisplay(p1);
 });
+
+function displayInfo(text) {
+  const main = document.querySelector(".main");
+
+  const infoBlur = document.createElement("div");
+  const info = document.createElement("div");
+  const infotext = document.createElement("h3");
+
+  infoBlur.classList.add("info__blure");
+  info.classList.add("info");
+  infotext.classList.add("info__text");
+  infotext.textContent = `${text}`;
+
+  info.append(infotext);
+  infoBlur.append(info);
+  main.prepend(infoBlur);
+
+  setTimeout(() => {
+    infoBlur.classList.add("vis");
+    info.classList.add("open");
+  });
+
+  infoBlur.addEventListener("click", () => {
+    infoBlur.classList.remove("vis");
+    info.classList.remove("open");
+  });
+}
+
+function shipBoom(params) {}
+
+function identifyShip(activePlayer, y, x) {
+  let originalPlayer = activePlayer; // Сохраняем игрока, который сделал выстрел
+  activePlayer = activePlayer == p1 ? p2 : p1;
+  let arrShip = activePlayer.gameBoard.coordinatesShip;
+
+  if (arrShip.length < 3) {
+    return; // Проверка на наличие кораблей
+  }
+
+  let coordinates;
+
+  // Поиск корабля по заданным координатам
+  for (let i = 0; i < arrShip.length; i += 3) {
+    if (y == arrShip[i] && x >= arrShip[i + 1] && x < arrShip[i + 1] + arrShip[i + 2]) {
+      coordinates = arrShip.slice(i, i + 3); // Получаем координаты корабля: [y, startX, length]
+      break; // Прекращаем поиск после нахождения нужного корабля
+    }
+  }
+
+  if (!coordinates) {
+    return; // Если корабль не найден, ничего не делаем
+  }
+
+  // Получаем все секции корабля
+  let shipSection = activePlayer.gameBoard.gameBoardObj[coordinates[0]].slice(
+    coordinates[1],
+    coordinates[1] + coordinates[2]
+  );
+
+  // Проверяем, потоплен ли корабль (нет ли секций со значением 1)
+  if (!shipSection.includes(1)) {
+    console.log(`Корабль размером ${coordinates[2]} потоплен`);
+
+    // Закрашиваем клетки вокруг корабля
+    for (let i = coordinates[1] - 1; i <= coordinates[1] + coordinates[2]; i++) {
+      if (i >= 0 && i < activePlayer.gameBoard.width) {
+        // Верхняя клетка
+        if (
+          coordinates[0] - 1 >= 0 &&
+          activePlayer.gameBoard.gameBoardObj[coordinates[0] - 1][i] === 0
+        ) {
+          activePlayer.gameBoard.gameBoardObj[coordinates[0] - 1][i] = 2;
+          let value = (coordinates[0] - 1) * 10 + i + 1;
+          displayShot(originalPlayer, [coordinates[0] - 1, i, 2], value); // Обновляем верхнюю клетку
+        }
+
+        // Нижняя клетка
+        if (
+          coordinates[0] + 1 < activePlayer.gameBoard.height &&
+          activePlayer.gameBoard.gameBoardObj[coordinates[0] + 1][i] === 0
+        ) {
+          activePlayer.gameBoard.gameBoardObj[coordinates[0] + 1][i] = 2;
+          let value = (coordinates[0] + 1) * 10 + i + 1;
+          displayShot(originalPlayer, [coordinates[0] + 1, i, 2], value); // Обновляем нижнюю клетку
+        }
+      }
+    }
+
+    // Левая клетка от корабля
+    if (
+      coordinates[1] - 1 >= 0 &&
+      activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] - 1] === 0
+    ) {
+      activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] - 1] = 2;
+      let value = coordinates[0] * 10 + coordinates[1];
+      displayShot(originalPlayer, [coordinates[0], coordinates[1], 2], value); // Обновляем левую клетку
+    }
+
+    // Правая клетка от корабля
+    if (
+      coordinates[1] + coordinates[2] < activePlayer.gameBoard.width &&
+      activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + coordinates[2]] === 0
+    ) {
+      activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + coordinates[2]] = 2;
+      let value = coordinates[0] * 10 + (coordinates[1] + coordinates[2] + 1);
+      displayShot(originalPlayer, [coordinates[0], coordinates[1] + coordinates[2], 2], value); // Обновляем правую клетку
+    }
+
+    return; // Завершаем после обработки потопленного корабля
+  } else {
+    console.log("Корабль не потоплен");
+  }
+}
 
 // module.exports = { Ship, Gameboard, Player };
