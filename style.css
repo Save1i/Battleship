@@ -16,7 +16,6 @@ body {
   font-family: "Kanit", sans-serif;
   font-weight: 900;
   font-style: normal;
-  overflow-y: hidden;
 }
 
 h1,
@@ -48,6 +47,7 @@ body {
   display: flex;
   gap: 8vw;
   margin-top: 25px;
+  margin-bottom: 20px;
 }
 
 .main {
