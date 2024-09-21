@@ -322,20 +322,35 @@ button:active {
   }
 
   .game-board__inner {
-    width: 55vw; /* Adjusts to the viewport width */
-    height: 55vw; /* Matches the width to ensure square sections */
-    max-width: 90vh; /* Keeps it responsive and prevents the board from exceeding viewport height */
-    max-height: 90vh; /* Ensures the board stays within the viewport */
+    width: 75vw;
+    height: 75vw;
+    max-width: 90vh;
+    max-height: 90vh;
   }
 
   .number__side {
     top: 1vw;
-    gap: 2.5vw;
+    left: -5vw;
+    gap: 4.6vw;
+    text-align: right;
+    font-size: 3vwx;
+  }
+
+  .letters__side {
+    display: grid;
+    grid-template-rows: repeat(1, 30px);
+    grid-template-columns: repeat(10, 1fr);
+    position: absolute;
+    top: -5vw;
+    z-index: 100;
+    font-size: 3vw;
+    color: #717c96;
+    opacity: 70%;
   }
 
   .letter {
     text-align: center;
-    width: 5.5vw;
+    width: 7.5vw;
   }
 
   .main {
@@ -356,15 +371,15 @@ button:active {
   }
 
   .destroy:before {
-    height: 5vw;
-    width: 0.4vw;
+    height: 7vw;
+    width: 0.6vw;
     top: 0%;
     left: 47%;
   }
 
   .destroy:after {
-    height: 5vw;
-    width: 0.4vw;
+    height: 7vw;
+    width: 0.6vw;
     top: 0%;
     left: 47%;
   }
