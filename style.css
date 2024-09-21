@@ -91,10 +91,6 @@ button:active {
   background-color: #ff7f50; /* Индивидуальный цвет для кнопки START */
 }
 
-.disable {
-  background-color: #9d9d9d;
-}
-
 .start__btn.disable {
   pointer-events: none;
 }
@@ -109,6 +105,14 @@ button:active {
 
 .move-ship__btn {
   background-color: #61c6ff; /* Цвет для RANDOMISE */
+}
+
+.disable {
+  background-color: #9d9d9d;
+}
+
+.move-ship__btn.disable {
+  pointer-events: none;
 }
 
 .move-ship__btn:hover {
@@ -333,7 +337,7 @@ button:active {
     left: -5vw;
     gap: 4.6vw;
     text-align: right;
-    font-size: 3vwx;
+    font-size: 3vw;
   }
 
   .letters__side {
