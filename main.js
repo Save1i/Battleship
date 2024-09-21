@@ -436,11 +436,9 @@ function botShot(activePlayer) {
   shotOnBoard(activePlayer, randValue);
 }
 
-//ПЕРЕСМОТРЕТЬ КОД, ПРИ МНОГОКРАТНОМ ВЫЗОВЕ, ЛОЖИТ БРАУЗЕР!!!!!!!!!!!
-
 function bot() {
   randomShip(p2);
-  shipdisplay(p2);
+  // shipdisplay(p2);
 }
 
 setInterval(() => {
@@ -519,12 +517,11 @@ function identifyShip(activePlayer, y, x) {
   let arrShip = activePlayer.gameBoard.coordinatesShip;
 
   if (arrShip.length < 3) {
-    return; // Проверка на наличие кораблей
+    return;
   }
 
   let coordinates;
 
-  // Поиск корабля по заданным координатам
   for (let i = 0; i < arrShip.length; i += 3) {
     if (y == arrShip[i] && x >= arrShip[i + 1] && x < arrShip[i + 1] + arrShip[i + 2]) {
       coordinates = arrShip.slice(i, i + 3); // Получаем координаты корабля: [y, startX, length]
@@ -533,7 +530,7 @@ function identifyShip(activePlayer, y, x) {
   }
 
   if (!coordinates) {
-    return; // Если корабль не найден, ничего не делаем
+    return;
   }
 
   // Получаем все секции корабля
@@ -581,7 +578,6 @@ function identifyShip(activePlayer, y, x) {
       displayShot(originalPlayer, [coordinates[0], coordinates[1], 2], value); // Обновляем левую клетку
     }
 
-    // Правая клетка от корабля
     if (
       coordinates[1] + coordinates[2] < activePlayer.gameBoard.width &&
       activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + coordinates[2]] === 0
@@ -591,7 +587,7 @@ function identifyShip(activePlayer, y, x) {
       displayShot(originalPlayer, [coordinates[0], coordinates[1] + coordinates[2], 2], value); // Обновляем правую клетку
     }
 
-    return; // Завершаем после обработки потопленного корабля
+    return;
   } else {
     console.log("Корабль не потоплен");
   }
