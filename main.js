@@ -474,6 +474,8 @@ startBtn.addEventListener("click", () => {
     startGame();
     startBtn.disabled = true;
     startBtn.classList.add("disable");
+    randomise.disabled = true;
+    randomise.classList.add("disable");
   } else {
     console.log("тестировщик молодец");
   }
