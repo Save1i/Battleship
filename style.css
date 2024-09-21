@@ -281,6 +281,14 @@ button:active {
   opacity: 70%;
 }
 
+.creator {
+  position: absolute;
+  content: "";
+  bottom: 10px;
+  color: #47a9e0;
+  opacity: 40%;
+}
+
 @media screen and (max-width: 768px) {
   .main {
     justify-content: space-evenly;
