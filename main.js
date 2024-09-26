@@ -232,8 +232,8 @@ async function shotOnBoard(activePlayer, value, y, x) {
     } else if (activePlayer.gameBoard.gameOver == true) {
       throw new Error("Ты проиграл ИИ!");
     }
-  } catch ({ name, message }) {
-    displayInfo(message);
+  } catch (error) {
+    displayInfo(error.message);
     console.error(error);
   }
 }

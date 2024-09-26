@@ -61,6 +61,12 @@ body {
   justify-content: space-around;
 }
 
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+}
+
 .menu {
   display: flex;
   gap: 10px;
@@ -151,6 +157,12 @@ button:active {
 
 .sections:hover {
   background-color: rgba(97, 198, 255, 0.4);
+}
+
+@media (pointer: coarse) {
+  .sections:hover {
+    background-color: rgba(97, 198, 255, 0.2);
+  }
 }
 
 .ship-part {
