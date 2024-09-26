@@ -294,14 +294,34 @@ button:active {
   opacity: 70%;
 }
 
+.footer__inner {
+  color: #717c96;
+  opacity: 70%;
+
+  align-content: center;
+}
+
 .creator {
-  text-align: center;
-  position: fixed;
-  left: 50%;
-  bottom: 10px;
-  color: #47a9e0;
-  opacity: 40%;
-  transform: translate(-50%, -50%);
+  margin: 0 auto;
+  width: max-content;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.github-logo {
+  display: block;
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.git__icon {
+  transition: all 0.2s ease;
+}
+
+.git__icon:hover {
+  transform: scale(1.5);
 }
 
 @media screen and (max-width: 768px) {
