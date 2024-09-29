@@ -226,8 +226,9 @@ async function shotOnBoard(activePlayer, value, y, x) {
       console.log(audio);
       if (coords[2] == 2) {
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
-
-        botShot(p1);
+        setTimeout(() => {
+          botShot(p1);
+        }, 1000);
       }
 
       displayShot(activePlayer, coords, value);
@@ -450,8 +451,8 @@ function clearBoard(activePlayer) {
 }
 
 function randomShip(activePlayer, randKey, startP) {
-  // const arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
-  const arrShip = [3, 3, 4, 4, 4, 3, 3];
+  const arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
+  // const arrShip = [3, 3, 4, 4, 4, 3, 3];
   clearBoard(activePlayer);
 
   arrShip.forEach((element) => {
