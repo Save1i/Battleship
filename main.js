@@ -226,6 +226,8 @@ async function shotOnBoard(activePlayer, value, y, x) {
       console.log(audio);
       if (coords[2] == 2) {
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
+
+        botShot(p1);
       }
 
       displayShot(activePlayer, coords, value);
@@ -244,7 +246,14 @@ async function shotOnBoard(activePlayer, value, y, x) {
         x = yx[1];
       }
 
-      coords = activePlayer.gameBoard.shot(y, x);
+      coords = activePlayer.gameBoard.shot(y, x); // если выдаст ошибку о том что это поле уже занято, нужно заново вызвать Botshot(p1)
+
+      if (coords instanceof Error) {
+        // Если coords это объект ошибки
+        console.log(coords.message); // Вывод сообщения об ошибке
+        botShot(p1); // Повторная попытка
+        return;
+      }
       console.log(activePlayer.gameBoard.gameBoardObj);
       console.log("Shot Result:", coords, activePlayer.gameBoard.active, noActive.gameBoard.active);
       identifyShip(noActive, y, x);
@@ -493,19 +502,19 @@ function bot() {
   shipdisplay(p2);
 }
 
-setInterval(() => {
-  let activePlayer = p1;
-  let noActive = activePlayer === p1 ? p2 : p1;
-  if (
-    !noActive.gameBoard.gameOver &&
-    !activePlayer.gameBoard.gameOver &&
-    !activePlayer.gameBoard.active &&
-    activePlayer.gameBoard.startGame &&
-    noActive.gameBoard.startGame
-  ) {
-    botShot(p1);
-  }
-}, 2500);
+// setInterval(() => {
+//   let activePlayer = p1;
+//   let noActive = activePlayer === p1 ? p2 : p1;
+//   if (
+//     !noActive.gameBoard.gameOver &&
+//     !activePlayer.gameBoard.gameOver &&
+//     !activePlayer.gameBoard.active &&
+//     activePlayer.gameBoard.startGame &&
+//     noActive.gameBoard.startGame
+//   ) {
+//     botShot(p1);
+//   }
+// }, 2500);
 
 bot();
 
@@ -574,6 +583,7 @@ function displayInfo(text) {
 }
 
 function findShip(activePlayer, y, x) {
+  let noActive = activePlayer === p1 ? p2 : p1;
   let arrShip = activePlayer.gameBoard.coordinatesShip;
 
   if (arrShip.length < 3) {
@@ -617,8 +627,12 @@ function findShip(activePlayer, y, x) {
 
   // Функция для выполнения выстрела с задержкой
   function delayedShot(index) {
+    if (activePlayer.gameBoard.gameOver || noActive.gameBoard.gameOver) {
+      return;
+    }
     if (index >= length) {
       console.log("Все секции проверены");
+      botShot(p1);
       return;
     }
 
