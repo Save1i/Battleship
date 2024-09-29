@@ -23,13 +23,22 @@ class Ship {
 }
 
 class Gameboard {
-  constructor(height = 10, width = 10, startGame = false, gameOver = false, active = false) {
+  constructor(
+    height = 10,
+    width = 10,
+    startGame = false,
+    gameOver = false,
+    active = false,
+    sound = true
+  ) {
     this.height = height;
     this.width = width;
     this.gameOver = gameOver;
     this.startGame = startGame;
 
     this.active = active;
+
+    this.sound = sound;
 
     this.coordinatesShip = new Array();
     this.coordinateShot = new Array();
@@ -222,8 +231,6 @@ async function shotOnBoard(activePlayer, value, y, x) {
       );
       identifyShip(activePlayer, y, x);
 
-      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
-      console.log(audio);
       if (coords[2] == 2) {
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
         setTimeout(() => {
@@ -234,9 +241,11 @@ async function shotOnBoard(activePlayer, value, y, x) {
       displayShot(activePlayer, coords, value);
       console.log(noActive.gameBoard.gameBoardObj);
 
-      if (!audio) return;
-      audio.currentTime = 0;
-      audio.play();
+      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
+      if (audio && p1.gameBoard.sound) {
+        audio.currentTime = 0;
+        audio.play();
+      }
     } else if (!noActive.gameBoard.active) {
       activePlayer.gameBoard.endGame();
 
@@ -259,22 +268,19 @@ async function shotOnBoard(activePlayer, value, y, x) {
       console.log("Shot Result:", coords, activePlayer.gameBoard.active, noActive.gameBoard.active);
       identifyShip(noActive, y, x);
 
-      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
-
       displayShot(noActive, coords, value);
-
-      if (!audio) return;
-      audio.currentTime = 0;
-      audio.play();
 
       if (coords[2] == 2) {
         console.log("СМЕНА ХОДА!!!!!!!");
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
       }
-      // if (coords[2] == 7) {
-      //   console.log(coords[2] + " ddd");
-      //   findShip(noActive, y, x);
-      // }
+
+      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
+
+      if (audio && p1.gameBoard.sound) {
+        audio.currentTime = 0;
+        audio.play();
+      }
     } else {
       console.log("hhhhh");
     }
@@ -736,5 +742,15 @@ function identifyShip(activePlayer, y, x) {
     console.log("Корабль не потоплен");
   }
 }
+
+const soundicon = document.querySelector(".sound__icon");
+const soundindicatorOn = document.querySelector(".sound__on");
+const soundindicatorOff = document.querySelector(".sound__off");
+
+soundicon.addEventListener("click", () => {
+  soundindicatorOn.classList.toggle("hidden");
+  soundindicatorOff.classList.toggle("hidden");
+  p1.gameBoard.sound = !p1.gameBoard.sound;
+});
 
 module.exports = { Ship, Gameboard, Player };
