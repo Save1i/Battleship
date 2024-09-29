@@ -73,6 +73,7 @@ class Gameboard {
       return new Error("введите данные для размещения корабля");
     }
     if (this.checkPlacement(key, startP, length)) {
+      // displayInfo("сюда нельзя поставить корабль");
       return new Error("сюда нельзя поставить корабль");
     }
     if (this.startGame == true) {
@@ -90,17 +91,25 @@ class Gameboard {
   }
 
   shot(y, x) {
-    console.log(this.gameBoardObj);
-    // this.active = !this.active;
-
-    let numOnObj = this.gameBoardObj[y][x];
-
+    // Ensure x and y are valid numbers within the board's bounds
     if (isNaN(x) || isNaN(y)) {
       throw new Error("Координаты не введены");
+    }
+
+    if (x < 0 || y < 0) {
+      throw new Error("x = -1 and y = -1 ");
     }
     if (x >= this.width || x < 0 || y >= this.height || y < 0) {
       throw new Error("Значения координат должны быть в пределах поля");
     }
+
+    let numOnObj = this.gameBoardObj[y]?.[x]; // Safe access with optional chaining
+
+    // Check if the coordinates are valid
+    if (numOnObj === undefined) {
+      throw new Error("Неправильные координаты");
+    }
+
     if (this.gameOver) {
       throw new Error("Игра окончена! Все корабли уничтожены.");
     }
@@ -140,9 +149,9 @@ class Player {
 const p1 = new Player(false); // player
 const p2 = new Player(true); // computer
 
-const pSections = document.querySelectorAll(".sect");
+const prSections = document.querySelectorAll(".sect");
 const rSections = document.querySelectorAll(".section");
-const sections = document.querySelectorAll(".sections");
+// const rSections = document.querySelectorAll(".rSections");
 
 function gameOver(player1, player2) {
   if (player1.gameBoard.gameOver || player2.gameBoard.gameOver) {
@@ -152,9 +161,10 @@ function gameOver(player1, player2) {
 
 function click(activePlayer, value) {
   let noActive = activePlayer === p1 ? p2 : p1;
-  sections.forEach((section) => {
+  rSections.forEach((section) => {
     section.addEventListener("click", (e) => {
       value = e.currentTarget.getAttribute("value");
+
       if (
         e.currentTarget.attributes.id.value === "r" &&
         activePlayer.gameBoard.active &&
@@ -184,6 +194,12 @@ function convertInXY(value) {
   return [y, x];
 }
 
+function convertInValue(y, x) {
+  let columns = 10;
+  const value = y * columns + (x + 1);
+  return value;
+}
+
 async function shotOnBoard(activePlayer, value, y, x) {
   let noActive = activePlayer === p1 ? p2 : p1;
 
@@ -198,14 +214,26 @@ async function shotOnBoard(activePlayer, value, y, x) {
       }
 
       let coords = noActive.gameBoard.shot(y, x);
-      console.log("Shot Result:", coords);
+      console.log(
+        "Shot Result: player",
+        coords,
+        activePlayer.gameBoard.active,
+        noActive.gameBoard.active
+      );
       identifyShip(activePlayer, y, x);
 
+      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
+      console.log(audio);
       if (coords[2] == 2) {
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
       }
 
       displayShot(activePlayer, coords, value);
+      console.log(noActive.gameBoard.gameBoardObj);
+
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play();
     } else if (!noActive.gameBoard.active) {
       activePlayer.gameBoard.endGame();
 
@@ -217,13 +245,26 @@ async function shotOnBoard(activePlayer, value, y, x) {
       }
 
       coords = activePlayer.gameBoard.shot(y, x);
-      console.log("Shot Result:", coords);
+      console.log(activePlayer.gameBoard.gameBoardObj);
+      console.log("Shot Result:", coords, activePlayer.gameBoard.active, noActive.gameBoard.active);
       identifyShip(noActive, y, x);
 
+      const audio = document.querySelector(`audio[data-key="${coords[2]}"]`);
+
       displayShot(noActive, coords, value);
+
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play();
+
       if (coords[2] == 2) {
+        console.log("СМЕНА ХОДА!!!!!!!");
         activePlayer.gameBoard.active = !activePlayer.gameBoard.active;
       }
+      // if (coords[2] == 7) {
+      //   console.log(coords[2] + " ddd");
+      //   findShip(noActive, y, x);
+      // }
     } else {
       console.log("hhhhh");
     }
@@ -400,8 +441,8 @@ function clearBoard(activePlayer) {
 }
 
 function randomShip(activePlayer, randKey, startP) {
-  const arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
-  // const arrShip = [3, 1];
+  // const arrShip = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
+  const arrShip = [3, 3, 4, 4, 4, 3, 3];
   clearBoard(activePlayer);
 
   arrShip.forEach((element) => {
@@ -431,14 +472,25 @@ function randomShip(activePlayer, randKey, startP) {
 }
 
 function botShot(activePlayer) {
-  const randValue = Math.floor(Math.random() * 101); // 0-100
+  const randValue = Math.floor(Math.random() * 100 + 1); // 1-100
 
-  shotOnBoard(activePlayer, randValue);
+  const yx = convertInXY(randValue);
+  let y = yx[0];
+  let x = yx[1];
+  console.log(y, x);
+  console.log(activePlayer.gameBoard.gameBoardObj[y]);
+  console.log(activePlayer.gameBoard.gameBoardObj[y].slice(x, x + 1));
+  if (activePlayer.gameBoard.gameBoardObj[y].slice(x, x + 1).includes(1)) {
+    findShip(activePlayer, y, x);
+    console.log("GGGGGGGGGGGGGGGGGGGGG");
+  } else {
+    shotOnBoard(activePlayer, randValue);
+  }
 }
 
 function bot() {
   randomShip(p2);
-  // shipdisplay(p2);
+  shipdisplay(p2);
 }
 
 setInterval(() => {
@@ -453,7 +505,7 @@ setInterval(() => {
   ) {
     botShot(p1);
   }
-}, 1000);
+}, 2500);
 
 bot();
 
@@ -461,6 +513,14 @@ function startGame() {
   p1.gameBoard.startGame = true;
   p2.gameBoard.startGame = true;
   p1.gameBoard.active = true;
+
+  prSections.forEach((section) => {
+    if (p1.gameBoard.startGame || p2.gameBoard.startGame) {
+      section.addEventListener("click", () => {
+        displayInfo("Не стреляй по своему полю");
+      });
+    }
+  });
 }
 
 click(p1);
@@ -511,6 +571,73 @@ function displayInfo(text) {
     infoBlur.classList.remove("vis");
     info.classList.remove("open");
   });
+}
+
+function findShip(activePlayer, y, x) {
+  let arrShip = activePlayer.gameBoard.coordinatesShip;
+
+  if (arrShip.length < 3) {
+    return;
+  }
+
+  let coordinates;
+
+  // Поиск корабля по координатам
+  for (let i = 0; i < arrShip.length; i += 3) {
+    if (y == arrShip[i] && x >= arrShip[i + 1] && x < arrShip[i + 1] + arrShip[i + 2]) {
+      coordinates = arrShip.slice(i, i + 3); // Получаем координаты корабля: [y, startX, length]
+      break; // Прекращаем поиск после нахождения нужного корабля
+    }
+  }
+
+  if (!coordinates) {
+    return;
+  }
+  console.log("Координаты корабля:", coordinates);
+
+  // Получаем все секции корабля
+  let shipSection = activePlayer.gameBoard.gameBoardObj[coordinates[0]].slice(
+    coordinates[1],
+    coordinates[1] + coordinates[2]
+  );
+
+  console.log("Секции корабля:", shipSection);
+
+  // Проверяем, есть ли ещё не поражённые секции (1)
+  if (!shipSection.includes(1)) {
+    console.log(`Корабль размером ${coordinates[2]} потоплен`);
+    return;
+  }
+
+  const x1 = coordinates[1]; // Начальная позиция по колонке
+  const y1 = coordinates[0]; // Позиция по строке
+  const length = coordinates[2]; // Длина корабля
+
+  console.log("Позиции (y1, x1):", y1, x1, "Длина корабля:", length);
+
+  // Функция для выполнения выстрела с задержкой
+  function delayedShot(index) {
+    if (index >= length) {
+      console.log("Все секции проверены");
+      return;
+    }
+
+    // Проверка статуса секции (есть ли непоражённые клетки)
+    if (activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + index] === 1) {
+      let value = convertInValue(coordinates[0], coordinates[1] + index);
+      console.log(coordinates[1] + index + " ffffffffffffffffff");
+      shotOnBoard(activePlayer, value); // Вызов функции выстрела
+      console.log("Выстрел по секции:", index);
+    } else {
+      console.log(`Секция ${index} уже поражена!`);
+    }
+
+    // Задержка перед следующим выстрелом
+    setTimeout(() => delayedShot(index + 1), 1000); // 1000 мс = 1 секунда
+  }
+
+  // Начинаем серию выстрелов с первой секции корабля
+  delayedShot(0);
 }
 
 function identifyShip(activePlayer, y, x) {
