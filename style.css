@@ -560,13 +560,9 @@ body {
     rotate: -45deg;
   }
 
-  .choose__dif {
-    padding-bottom: 4vw;
-  }
-
   .choose__title {
     line-height: 6vw;
-    font-size: 6vw;
+    font-size: 5vw;
     font-weight: 500;
     color: #717c96;
   }
@@ -686,12 +682,29 @@ body {
     left: 47%;
   }
 
+  .choose__dif {
+    padding-top: 4vw;
+    padding-bottom: 4vw;
+  }
+
+  .choose__title {
+    font-size: 7vw;
+  }
+
+  .choose__container-btn {
+    margin-top: 6vw;
+  }
+
   .btn__easy {
-    border: 2px solid #61c6ff;
-    border-radius: 4px;
+    border: 4px solid #61c6ff;
+    border-radius: 2px;
+    font-size: 6vw;
+    border-radius: 8px;
   }
   .btn__hard {
-    border: 2px solid #ff7f50;
-    border-radius: 4px;
+    border: 4px solid #ff7f50;
+    border-radius: 2px;
+    font-size: 6vw;
+    border-radius: 8px;
   }
 }
