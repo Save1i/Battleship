@@ -693,16 +693,19 @@ body {
 
   .choose__container-btn {
     margin-top: 6vw;
+    gap: 2vw;
   }
 
   .btn__easy {
-    border: 4px solid #61c6ff;
+    border: 3px solid #61c6ff;
+    padding: 2vw 4vw 2vw 4vw;
     border-radius: 2px;
     font-size: 6vw;
     border-radius: 8px;
   }
   .btn__hard {
-    border: 4px solid #ff7f50;
+    border: 3px solid #ff7f50;
+    padding: 2vw 4vw 2vw 4vw;
     border-radius: 2px;
     font-size: 6vw;
     border-radius: 8px;
