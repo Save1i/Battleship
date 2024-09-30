@@ -29,7 +29,8 @@ class Gameboard {
     startGame = false,
     gameOver = false,
     active = false,
-    sound = true
+    sound = true,
+    mode = ""
   ) {
     this.height = height;
     this.width = width;
@@ -39,6 +40,8 @@ class Gameboard {
     this.active = active;
 
     this.sound = sound;
+
+    this.mode = mode;
 
     this.coordinatesShip = new Array();
     this.coordinateShot = new Array();
@@ -264,6 +267,7 @@ async function shotOnBoard(activePlayer, value, y, x) {
         botShot(p1); // Повторная попытка
         return;
       }
+
       console.log(activePlayer.gameBoard.gameBoardObj);
       console.log("Shot Result:", coords, activePlayer.gameBoard.active, noActive.gameBoard.active);
       identifyShip(noActive, y, x);
@@ -281,6 +285,12 @@ async function shotOnBoard(activePlayer, value, y, x) {
         audio.currentTime = 0;
         audio.play();
       }
+
+      if (coords[2] == 7 && p2.gameBoard.mode === "easy") {
+        botShot(p1);
+      }
+
+      console.log(p2.gameBoard.mode);
     } else {
       console.log("hhhhh");
     }
@@ -496,7 +506,10 @@ function botShot(activePlayer) {
   console.log(y, x);
   console.log(activePlayer.gameBoard.gameBoardObj[y]);
   console.log(activePlayer.gameBoard.gameBoardObj[y].slice(x, x + 1));
-  if (activePlayer.gameBoard.gameBoardObj[y].slice(x, x + 1).includes(1)) {
+  if (
+    activePlayer.gameBoard.gameBoardObj[y].slice(x, x + 1).includes(1) &&
+    p2.gameBoard.mode == "hard"
+  ) {
     findShip(activePlayer, y, x);
     console.log("GGGGGGGGGGGGGGGGGGGGG");
   } else {
@@ -529,6 +542,10 @@ function startGame() {
   p1.gameBoard.startGame = true;
   p2.gameBoard.startGame = true;
   p1.gameBoard.active = true;
+
+  if (p2.gameBoard.mode !== "hard") {
+    p2.gameBoard.mode = "easy";
+  }
 
   prSections.forEach((section) => {
     if (p1.gameBoard.startGame || p2.gameBoard.startGame) {
@@ -752,5 +769,53 @@ soundicon.addEventListener("click", () => {
   soundindicatorOff.classList.toggle("hidden");
   p1.gameBoard.sound = !p1.gameBoard.sound;
 });
+
+function chouseDifficulty() {
+  const chooseD = document.createElement("div");
+  const chooseDtitle = document.createElement("h3");
+  const chooseBtnContainer = document.createElement("div");
+  const infoBlur = document.createElement("div");
+
+  const btnEasy = document.createElement("button");
+  const btnHard = document.createElement("button");
+
+  const main = document.querySelector("main");
+
+  chooseD.classList.add("choose__dif");
+  chooseDtitle.classList.add("choose__title");
+  chooseBtnContainer.classList.add("choose__container-btn");
+  btnEasy.classList.add("btn__easy");
+  btnHard.classList.add("btn__hard");
+
+  infoBlur.classList.add("info__blure");
+  infoBlur.classList.add("vis");
+
+  btnEasy.textContent = "EASY";
+  btnHard.textContent = "HARD";
+
+  chooseDtitle.textContent = "SELECT DIFFICULTY";
+
+  chooseBtnContainer.append(btnEasy);
+  chooseBtnContainer.append(btnHard);
+
+  chooseD.append(chooseDtitle);
+  chooseD.append(chooseBtnContainer);
+  infoBlur.append(chooseD);
+
+  main.prepend(infoBlur);
+
+  btnEasy.addEventListener("click", () => {
+    chooseD.classList.add("hidden");
+    infoBlur.classList.remove("vis");
+  });
+
+  btnHard.addEventListener("click", () => {
+    p2.gameBoard.mode = "hard";
+    chooseD.classList.add("hidden");
+    infoBlur.classList.remove("vis");
+  });
+}
+
+chouseDifficulty();
 
 module.exports = { Ship, Gameboard, Player };
