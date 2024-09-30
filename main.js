@@ -519,7 +519,7 @@ function botShot(activePlayer) {
 
 function bot() {
   randomShip(p2);
-  shipdisplay(p2);
+  // shipdisplay(p2);
 }
 
 // setInterval(() => {
