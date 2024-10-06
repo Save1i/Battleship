@@ -1,24 +1,9 @@
 class Ship {
-  constructor(length = 0, hits = 0, rip = false) {
+  constructor(length = 0) {
     if (length <= 0) {
       return new Error("Длинна корабля должна быть больше 0");
     }
     this.length = length;
-    this.hits = hits;
-    this.rip = rip;
-  }
-
-  hit() {
-    if (!this.rip) {
-      this.hits += 1;
-    }
-    if (this.isSunk()) {
-      this.rip = true;
-    }
-  }
-
-  isSunk() {
-    return this.hits >= this.length;
   }
 }
 
@@ -57,39 +42,31 @@ class Gameboard {
     this.gameBoardObj = gameBoardObj;
   }
 
-  createShip(length) {
-    const newShip = new Ship(length);
-    return newShip;
-  }
-
   checkPlacement(key, startP, length) {
-    let error = false;
-
     for (let i = startP - 1; i <= startP + length; i++) {
       if (i >= 0 && i < this.width) {
         if (
           this.gameBoardObj[key][i] === 1 ||
-          (key - 1 >= 0 && this.gameBoardObj[key - 1][i] === 1) ||
-          (key + 1 < this.height && this.gameBoardObj[key + 1][i] === 1)
+          (key - 1 >= 0 && this.gameBoardObj[key - 1][i] === 1) || // строка сверху
+          (key + 1 < this.height && this.gameBoardObj[key + 1][i] === 1) // строка снизу
         ) {
-          return (error = true);
+          return new Error("Корабли не могут стоять вплотную");
         }
       }
     }
-
-    return error;
   }
 
   placeShip(key, startP, length) {
+    if (this.startGame === true) {
+      return new Error("Игра уже началась, нельзя переставлять корабли");
+    }
+
     if (key < 0 || startP < 0 || !length) {
       return new Error("введите данные для размещения корабля");
     }
     if (this.checkPlacement(key, startP, length)) {
       // displayInfo("сюда нельзя поставить корабль");
       return new Error("сюда нельзя поставить корабль");
-    }
-    if (this.startGame == true) {
-      return new Error("игра уже началась, нельзя переставлять корабли");
     }
     if (this.width - (startP - 1) <= length || startP < 0) {
       return new Error("часть карабля выходит за пределы поля");
@@ -103,7 +80,6 @@ class Gameboard {
   }
 
   shot(y, x) {
-    // Ensure x and y are valid numbers within the board's bounds
     if (isNaN(x) || isNaN(y)) {
       throw new Error("Координаты не введены");
     }
@@ -115,9 +91,8 @@ class Gameboard {
       throw new Error("Значения координат должны быть в пределах поля");
     }
 
-    let numOnObj = this.gameBoardObj[y]?.[x]; // Safe access with optional chaining
+    let numOnObj = this.gameBoardObj[y]?.[x];
 
-    // Check if the coordinates are valid
     if (numOnObj === undefined) {
       throw new Error("Неправильные координаты");
     }
