@@ -57,7 +57,7 @@ class Gameboard {
   }
 
   placeShip(key, startP, length) {
-    if (this.startGame === true) {
+    if (this.startGame) {
       return new Error("Игра уже началась, нельзя переставлять корабли");
     }
 
@@ -139,6 +139,17 @@ const p2 = new Player(true); // computer
 const prSections = document.querySelectorAll(".sect");
 const rSections = document.querySelectorAll(".section");
 // const rSections = document.querySelectorAll(".rSections");
+
+const loader = document.querySelector(".loader");
+window.onload = function () {
+  setTimeout(() => {
+    loader.classList.add("hidden");
+  }, 1500);
+};
+
+// window.addEventListener("load", () => {
+//   loader.classList.add("hidden");
+// });
 
 function gameOver(player1, player2) {
   if (player1.gameBoard.gameOver || player2.gameBoard.gameOver) {
@@ -315,107 +326,19 @@ function drawShip(section) {
 
 function shipdisplay(activePlayer) {
   let arrShip = activePlayer.gameBoard.coordinatesShip;
-  activePlayer == p1 ? (id = "p") : (id = "r");
+  let id = activePlayer == p1 ? "p" : "r";
 
   for (let i = 0; i < arrShip.length; i += 3) {
     const x = arrShip[i]; // Column position
     const y = arrShip[i + 1]; // Row position
     const length = arrShip[i + 2]; // Length of the ship
+    const offset = x * 10; // Общий сдвиг для каждой группы значений x (0-9)
 
-    switch (x) {
-      case 0: // x from 0 to 9
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 1: // x from 10 to 19
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 10 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 2: // x from 20 to 29
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 20 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 3: // x from 30 to 39
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 30 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 4: // x from 40 to 49
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 40 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 5: // x from 50 to 59
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 50 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 6: // x from 60 to 69
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 60 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 7: // x from 70 to 79
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 70 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 8: // x from 80 to 89
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 80 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      case 9: // x from 90 to 99
-        for (let i = 1; i < length + 1; i++) {
-          const targetSection = document.querySelector(`#${id}[value='${y + 90 + i}']`);
-          if (targetSection) {
-            drawShip(targetSection);
-          }
-        }
-        break;
-
-      default:
-        console.error(`Value of x (${x}) is out of expected range.`);
-        break;
+    for (let j = 1; j <= length; j++) {
+      const targetSection = document.querySelector(`#${id}[value='${y + offset + j}']`);
+      if (targetSection) {
+        drawShip(targetSection);
+      }
     }
   }
   console.log(arrShip);
@@ -624,33 +547,33 @@ function findShip(activePlayer, y, x) {
 
   console.log("Позиции (y1, x1):", y1, x1, "Длина корабля:", length);
 
-  // Функция для выполнения выстрела с задержкой
-  function delayedShot(index) {
-    if (activePlayer.gameBoard.gameOver || noActive.gameBoard.gameOver) {
-      return;
-    }
-    if (index >= length) {
-      console.log("Все секции проверены");
-      botShot(p1);
-      return;
-    }
+  // Начинаем серию выстрелов с первой секции корабля
+  delayedShot(0, coordinates, activePlayer, noActive);
+}
 
-    // Проверка статуса секции (есть ли непоражённые клетки)
-    if (activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + index] === 1) {
-      let value = convertInValue(coordinates[0], coordinates[1] + index);
-      console.log(coordinates[1] + index + " ffffffffffffffffff");
-      shotOnBoard(activePlayer, value); // Вызов функции выстрела
-      console.log("Выстрел по секции:", index);
-    } else {
-      console.log(`Секция ${index} уже поражена!`);
-    }
-
-    // Задержка перед следующим выстрелом
-    setTimeout(() => delayedShot(index + 1), 1000); // 1000 мс = 1 секунда
+// Функция для выполнения выстрела с задержкой
+function delayedShot(index, coordinates, activePlayer, noActive) {
+  if (activePlayer.gameBoard.gameOver || noActive.gameBoard.gameOver) {
+    return;
+  }
+  if (index >= coordinates[2]) {
+    console.log("Все секции проверены");
+    botShot(p1);
+    return;
   }
 
-  // Начинаем серию выстрелов с первой секции корабля
-  delayedShot(0);
+  // Проверка статуса секции (есть ли непоражённые клетки)
+  if (activePlayer.gameBoard.gameBoardObj[coordinates[0]][coordinates[1] + index] === 1) {
+    let value = convertInValue(coordinates[0], coordinates[1] + index);
+    console.log(coordinates[1] + index + " ffffffffffffffffff");
+    shotOnBoard(activePlayer, value); // Вызов функции выстрела
+    console.log("Выстрел по секции:", index);
+  } else {
+    console.log(`Секция ${index} уже поражена!`);
+  }
+
+  // Задержка перед следующим выстрелом
+  setTimeout(() => delayedShot(index + 1, coordinates, activePlayer, noActive), 1000); // 1000 мс = 1 секунда
 }
 
 function identifyShip(activePlayer, y, x) {
