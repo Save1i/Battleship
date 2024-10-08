@@ -140,7 +140,7 @@ const prSections = document.querySelectorAll(".sect");
 const rSections = document.querySelectorAll(".section");
 // const rSections = document.querySelectorAll(".rSections");
 
-const loader = document.querySelector(".loader");
+// const loader = document.querySelector(".loader");
 window.onload = function () {
   setTimeout(() => {
     loader.classList.add("hidden");
