@@ -61,6 +61,82 @@ body {
   justify-content: space-around;
 }
 
+.loader {
+  position: absolute;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100vh;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+}
+
+section {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  /* background: aliceblue; */
+  overflow: hidden;
+}
+
+section .wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url(water.svg);
+  background-size: 416px 140px;
+  animation: animate 3.5s linear infinite;
+  z-index: 1000;
+  opacity: 1;
+  animation-delay: 0s;
+}
+
+@keyframes animate {
+  from {
+    background-position-x: 416px;
+  }
+
+  to {
+    background-position-x: 0;
+  }
+}
+
+section .ship {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 158px;
+  height: 120px;
+  background: url(ship.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  transform: translate(-50%, 50%);
+
+  animation: ship 1.3s infinite cubic-bezier(0.64, 0.3, 0.51, 0.96) alternate;
+
+  opacity: 1;
+  animation-delay: 0s;
+}
+
+@keyframes ship {
+  from {
+    transform: rotate(-15deg);
+    bottom: 26%;
+    left: 18%;
+  }
+
+  to {
+    transform: rotate(10deg);
+    bottom: 24%;
+    left: 18%;
+  }
+}
+
 .board {
   display: flex;
   flex-direction: column;
