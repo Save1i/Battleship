@@ -146,6 +146,7 @@ window.addEventListener("load", () => {
     loader.classList.add("hidden");
   }, 1500);
 });
+
 // window.onload = function () {};
 
 // window.addEventListener("load", () => {
