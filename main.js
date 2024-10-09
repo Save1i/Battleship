@@ -140,12 +140,13 @@ const prSections = document.querySelectorAll(".sect");
 const rSections = document.querySelectorAll(".section");
 // const rSections = document.querySelectorAll(".rSections");
 
-// const loader = document.querySelector(".loader");
-window.onload = function () {
+const loader = document.querySelector(".loader");
+window.addEventListener("load", () => {
   setTimeout(() => {
     loader.classList.add("hidden");
   }, 1500);
-};
+});
+// window.onload = function () {};
 
 // window.addEventListener("load", () => {
 //   loader.classList.add("hidden");
