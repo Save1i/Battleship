@@ -1,4 +1,4 @@
-#[Battle ship Live](https://save1i.github.io/Battleship/)
+# [Battle ship Live](https://save1i.github.io/Battleship/)
 
 # Документация
 
